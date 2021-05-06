@@ -80,12 +80,17 @@ public class TaskModel {
                 float currentTaskEndTime = currentTask.getEndTime();
 
                 //This disqualifies same start time, and the task to be added is in the duration of another task
-                if(task.getStartTime() >= currentTaskStartTime && task.getStartTime() <= currentTaskEndTime)
+                if(task.getStartTime() >= currentTaskStartTime && task.getStartTime() < currentTaskEndTime)
                     return false;
 
                 //is the task has a duration that bleeds onto another task
-                if(task.getEndTime() >= currentTaskStartTime && task.getEndTime() <= currentTaskEndTime)
+                if(task.getEndTime() > currentTaskStartTime && task.getEndTime() <= currentTaskEndTime)
                     return false;
+
+                // Case where task to be added starts before current task and ends after current task
+                if (task.getStartTime() <= currentTaskStartTime && task.getEndTime() >= currentTaskEndTime) {
+                    return false;
+                }
             }
         }
 
@@ -96,13 +101,15 @@ public class TaskModel {
             if (getDayOfWeek(recTask.getStartDate()) == getDayOfWeek(task.getDate())) {
 
                 // Check if this recurring task overlaps with the task to be added
-                if ((task.getStartTime() >= recTask.getStartTime() && task.getStartTime() <= recTask.getEndTime()) || (task.getEndTime() >= recTask.getStartTime() && task.getEndTime() <= recTask.getEndTime())) {
+                if ((task.getStartTime() >= recTask.getStartTime() && task.getStartTime() < recTask.getEndTime())
+                        || (task.getEndTime() > recTask.getStartTime() && task.getEndTime() <= recTask.getEndTime())
+                        || (task.getStartTime() <= recTask.getStartTime() && task.getEndTime() >= recTask.getEndTime())) {
 
                     // Check if there is an anti-task that cancels out this overlapping recurring task
                     for (AntiTask antiTask : antiTasks) {
                         // First check if anti-task date matches the task to be added
                         if (antiTask.getDate() == task.getDate()) {
-                            // Check if this anti-task matches the recurring task. If it matches, this specific recurring tasks shouldn't block the task we are trying to add.
+                            // Check if this anti-task matches the recurring task. If it matches, this recurring task shouldn't block the task we are trying to add.
                             if (antiTask.getStartTime() == recTask.getStartTime()) {
                                 return true;
                             }
@@ -122,6 +129,8 @@ public class TaskModel {
         return true;
     }
     private boolean verifyAntiDate(AntiTask task){
+        // can only have one instance of anti-task cancelling out a particular recurring task
+        // need to match
         return true;
     }
     private boolean verifyRecurringDate(RecurringTask task){
