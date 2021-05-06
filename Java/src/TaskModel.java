@@ -129,9 +129,30 @@ public class TaskModel {
         return true;
     }
     private boolean verifyAntiDate(AntiTask task){
-        // can only have one instance of anti-task cancelling out a particular recurring task
-        // need to match
-        return true;
+        // Can't have duplicate anti-tasks
+        for (AntiTask antiTask : antiTasks) {
+            if (antiTask.getDate() == task.getDate() && antiTask.getStartTime() == task.getStartTime()) {
+                return false;
+            }
+        }
+
+        // Need a matching recurring task to create anti-task
+        for (RecurringTask recTask : recurringTasks) {
+
+            // (For weekly recurring tasks) Find a recurring task that falls on the same day of the week as this anti-task
+            // (For daily recurring tasks) Find recurring task that's occurring during anti-task's date
+            if ((recTask.getFrequency() == 7 && getDayOfWeek(recTask.getStartDate()) == getDayOfWeek(task.getDate()))
+                    || (recTask.getFrequency() == 1 && (task.getDate() >= recTask.getStartDate() && task.getDate() <= recTask.getEndDate()))) {
+
+                // Now check if start times and duration match
+                if (recTask.getStartTime() == task.getStartTime() && recTask.getDuration() == task.getDuration()) {
+                    return true;
+                }
+            }
+        }
+
+        // No matching recurring task found for this anti-task
+        return false;
     }
     private boolean verifyRecurringDate(RecurringTask task){
         return true;
