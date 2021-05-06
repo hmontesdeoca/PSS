@@ -42,4 +42,10 @@ public class Task {
     public void setDuration(float duration) {
         this.duration = duration;
     }
+
+    public float getEndTime() {
+        float endTime = startTime + duration;
+        if (endTime >= 24.0) return endTime - 24;
+        else return endTime;
+    }
 }
