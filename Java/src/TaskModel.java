@@ -72,6 +72,7 @@ public class TaskModel {
         return true;
     }
     private boolean verifyTransientDate(TransientTask task){
+        // Check if task to be added clashes with any transient tasks
         for(int i =0; i < transientTasks.size(); i++){
             TransientTask currentTask = transientTasks.get(i);
             if(currentTask.getDate() == task.getDate()){
@@ -87,6 +88,37 @@ public class TaskModel {
                     return false;
             }
         }
+
+        // Check if task to be added clashes with any recurring tasks
+        for (RecurringTask recTask : recurringTasks) {
+
+            // Check if this recurring task occurs on the same day as task to be added
+            if (getDayOfWeek(recTask.getStartDate()) == getDayOfWeek(task.getDate())) {
+
+                // Check if this recurring task overlaps with the task to be added
+                if ((task.getStartTime() >= recTask.getStartTime() && task.getStartTime() <= recTask.getEndTime()) || (task.getEndTime() >= recTask.getStartTime() && task.getEndTime() <= recTask.getEndTime())) {
+
+                    // Check if there is an anti-task that cancels out this overlapping recurring task
+                    for (AntiTask antiTask : antiTasks) {
+                        // First check if anti-task date matches the task to be added
+                        if (antiTask.getDate() == task.getDate()) {
+                            // Check if this anti-task matches the recurring task. If it matches, this specific recurring tasks shouldn't block the task we are trying to add.
+                            if (antiTask.getStartTime() == recTask.getStartTime()) {
+                                return true;
+                            }
+                            else {
+                                return false;
+                            }
+                        }
+                    }
+
+                    // No anti-task found to cancel this blocking recurring task
+                    return false;
+                }
+            }
+        }
+
+        // No blocking overlapping transient or recurring tasks
         return true;
     }
     private boolean verifyAntiDate(AntiTask task){
