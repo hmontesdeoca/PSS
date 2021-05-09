@@ -8,11 +8,8 @@ public class TransientTask extends Task {
         float temp = startTime + duration;
         if(temp > 24) {
             temp = temp - 24;
-            endTime = temp;
         }
-        else{
-            endTime=temp;
-        }
+        endTime = temp;
     }
 
     public int getDate() {

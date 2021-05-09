@@ -7,30 +7,32 @@ public class TaskModel {
     private ArrayList<AntiTask> antiTasks = new ArrayList<>();
     private ArrayList<RecurringTask> recurringTasks = new ArrayList<>();
 
-    public void editTask(Task task){
+    public void editTask(Task task) {
 
     }
 
-    public void deleteTask(Task task){
+    public void deleteTask(Task task) {
 
     }
 
-    public Task locateTask(String taskName){
+    public Task locateTask(String taskName) {
 
         return null;
     }
 
     public void createTransientTask(String name, String type, float startTime, float duration, int date) {
-        Task task = new TransientTask(name, type, startTime, duration, date);
-        if()
+
+        if(verifyTransientDate(new TransientTask(name, type, startTime, duration, date)))
+            transientTasks.add(new TransientTask(name, type, startTime, duration, date));
     }
 
-    public void createAntiTask(){
+    public void createAntiTask() {
 
     }
 
-    public void createRecurringTask(){
-
+    public void createRecurringTask(String name, String type, float startTime, float duration, int startDate, int endDate, int frequency) {
+        if(verifyRecurringDate(new RecurringTask(name,type, startTime, duration, startDate, endDate, frequency)));
+            recurringTasks.add(new RecurringTask(name,type, startTime, duration, startDate, endDate, frequency));
     }
 
     /**
@@ -40,14 +42,14 @@ public class TaskModel {
      * @param date is an int in the form YYYYMMDD
      * @return Day of the week as integer
      */
-    private int getDayOfWeek(int date){
+    private int getDayOfWeek(int date) {
         int day = date % 100;
         date /= 100;
         int month = (date % 100);
         date /= 100;
         int year = date % 100;
         date /= 100;
-        int century =  date;
+        int century = date;
 
         // Subtract 1 from year if month is Jan or Feb
         if (month <= 2) {
@@ -64,27 +66,30 @@ public class TaskModel {
                 (2 * century) + year + Math.floor(year / 4.0) + Math.floor(century / 4.0)), 7);
     }
 
-    private boolean verifyName(String taskName){
-        for(int i =0; i <taskList.size(); i++){
-            if(taskList.get(i).getName().equals(taskName))
+    private boolean verifyName(String taskName) {
+        for (int i = 0; i < taskList.size(); i++) {
+            if (taskList.get(i).getName().equals(taskName))
                 return false;
         }
         return true;
     }
-    private boolean verifyTransientDate(TransientTask task){
+
+
+    //TODO: fix verify transeint to check for daily frequency
+    private boolean verifyTransientDate(TransientTask task) {
         // Check if task to be added clashes with any transient tasks
-        for(int i =0; i < transientTasks.size(); i++){
+        for (int i = 0; i < transientTasks.size(); i++) {
             TransientTask currentTask = transientTasks.get(i);
-            if(currentTask.getDate() == task.getDate()){
+            if (currentTask.getDate() == task.getDate()) {
                 float currentTaskStartTime = currentTask.getStartTime();
                 float currentTaskEndTime = currentTask.getEndTime();
 
                 //This disqualifies same start time, and the task to be added is in the duration of another task
-                if(task.getStartTime() >= currentTaskStartTime && task.getStartTime() < currentTaskEndTime)
+                if (task.getStartTime() >= currentTaskStartTime && task.getStartTime() < currentTaskEndTime)
                     return false;
 
                 //is the task has a duration that bleeds onto another task
-                if(task.getEndTime() > currentTaskStartTime && task.getEndTime() <= currentTaskEndTime)
+                if (task.getEndTime() > currentTaskStartTime && task.getEndTime() <= currentTaskEndTime)
                     return false;
 
                 // Case where task to be added starts before current task and ends after current task
@@ -112,13 +117,11 @@ public class TaskModel {
                             // Check if this anti-task matches the recurring task. If it matches, this recurring task shouldn't block the task we are trying to add.
                             if (antiTask.getStartTime() == recTask.getStartTime()) {
                                 return true;
-                            }
-                            else {
+                            } else {
                                 return false;
                             }
                         }
                     }
-
                     // No anti-task found to cancel this blocking recurring task
                     return false;
                 }
@@ -128,7 +131,8 @@ public class TaskModel {
         // No blocking overlapping transient or recurring tasks
         return true;
     }
-    private boolean verifyAntiDate(AntiTask task){
+
+    private boolean verifyAntiDate(AntiTask task) {
         // Can't have duplicate anti-tasks
         for (AntiTask antiTask : antiTasks) {
             if (antiTask.getDate() == task.getDate() && antiTask.getStartTime() == task.getStartTime()) {
@@ -154,7 +158,73 @@ public class TaskModel {
         // No matching recurring task found for this anti-task
         return false;
     }
-    private boolean verifyRecurringDate(RecurringTask task){
+
+    public void printArrays(){
+        System.out.println("TRANSIENT TASKS");
+        System.out.println("----------------");
+        for(TransientTask task : transientTasks)
+            System.out.println(task.getName());
+        System.out.println();
+        System.out.println("RECURRING TASKS");
+        System.out.println("----------------");
+        for(RecurringTask task : recurringTasks)
+            System.out.println(task.getName());
+        System.out.println();
+    }
+
+    private boolean verifyRecurringDate(RecurringTask task) {
+        //checking for weekly frequency
+        if(task.getFrequency()==7){
+            for (int i = 0; i < transientTasks.size(); i++) {
+                TransientTask currentTask = transientTasks.get(i);
+                //check if any transient tasks have the same day of the week as this recurring task
+                //AND check if the task does not end before another task
+                if (getDayOfWeek(task.getStartDate()) == getDayOfWeek(currentTask.getDate()) &&
+                        (currentTask.getDate() < task.getEndDate() && currentTask.getDate() > task.getEndDate())) {
+                    //check if they have any overlapping times
+                    float currentTaskStartTime = currentTask.getStartTime();
+                    float currentTaskEndTime = currentTask.getEndTime();
+
+                    //This disqualifies same start time, and the task to be added is in the duration of another task
+                    if (task.getStartTime() >= currentTaskStartTime && task.getStartTime() < currentTaskEndTime)
+                        return false;
+
+                    //is the task has a duration that bleeds onto another task
+                    if (task.getEndTime() > currentTaskStartTime && task.getEndTime() <= currentTaskEndTime)
+                        return false;
+
+                    // Case where task to be added starts before current task and ends after current task
+                    if (task.getStartTime() <= currentTaskStartTime && task.getEndTime() >= currentTaskEndTime) {
+                        return false;
+                    }
+                }
+            }
+        }
+        //checking for daily frequency
+        else{
+            for (int i = 0; i < transientTasks.size(); i++){
+                TransientTask currentTask = transientTasks.get(i);
+                //transient task falls in range
+                if(currentTask.getDate() < task.getEndDate() && currentTask.getDate() > task.getEndDate()){
+                    //check if they have any overlapping times
+                    float currentTaskStartTime = currentTask.getStartTime();
+                    float currentTaskEndTime = currentTask.getEndTime();
+
+                    //This disqualifies same start time, and the task to be added is in the duration of another task
+                    if (task.getStartTime() >= currentTaskStartTime && task.getStartTime() < currentTaskEndTime)
+                        return false;
+
+                    //is the task has a duration that bleeds onto another task
+                    if (task.getEndTime() > currentTaskStartTime && task.getEndTime() <= currentTaskEndTime)
+                        return false;
+
+                    // Case where task to be added starts before current task and ends after current task
+                    if (task.getStartTime() <= currentTaskStartTime && task.getEndTime() >= currentTaskEndTime) {
+                        return false;
+                    }
+                }
+            }
+        }
         return true;
     }
 }
