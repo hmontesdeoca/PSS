@@ -16,7 +16,21 @@ public class TaskModel {
     }
 
     public Task locateTask(String taskName) {
+        // Look through all of our tasks and return the task if name matches
+        for (TransientTask transientTask : transientTasks) {
+            // Ignore lowercase/uppercase for now
+            if (transientTask.getName().equalsIgnoreCase(taskName)) return transientTask;
+        }
 
+        for (RecurringTask recurringTask : recurringTasks) {
+            if (recurringTask.getName().equalsIgnoreCase(taskName)) return recurringTask;
+        }
+
+        for (AntiTask antiTask : antiTasks) {
+            if (antiTask.getName().equalsIgnoreCase(taskName)) return antiTask;
+        }
+
+        // Figure out what we want to return if task is not found
         return null;
     }
 
