@@ -11,8 +11,69 @@ public class TaskModel {
 
     }
 
-    public void deleteTask(Task task) {
+    public void deleteTask(String taskName) {
+        Task result = locateTask(taskName);
 
+        if (result != null) {
+            // Deleting a recurring task
+            if (result instanceof RecurringTask) {
+                recurringTasks.remove(result);  // Might have to cast this to remove properly? Not sure
+
+                // Also delete any anti-tasks associated with deleted recurring task
+                AntiTask antiTask = getMatchingAntiTask((RecurringTask) result);
+                if (antiTask != null) {
+                    antiTasks.remove(antiTask);
+                }
+            }
+
+            // Deleting an anti-task
+            else if (result instanceof AntiTask) {
+                // TODO
+            }
+
+            // Deleting a transient task
+            else {
+                transientTasks.remove(result);
+            }
+        }
+
+        // result should be null if there is no match
+        else {
+            System.out.println("Task to delete does not exist");
+        }
+
+    }
+
+    /**
+     * Return an anti-task associated with a given recurring task if found, return null if no match
+     *
+     * @param task is a RecurringTask object
+     * @return AntiTask associated with the recurring task
+     */
+    private AntiTask getMatchingAntiTask(RecurringTask task) {
+        for (AntiTask antitask : antiTasks) {
+            // For daily recurring tasks
+            if (task.getFrequency() == 1) {
+                // Check if start time matches
+                if (antitask.getStartTime() == task.getStartTime()) {
+                    return antitask;
+                }
+            }
+
+            // For weekly recurring tasks
+            else {
+                // First check if day of week matches
+                if (getDayOfWeek(antitask.getDate()) == getDayOfWeek(task.getStartDate())) {
+                    // Check if start time matches
+                    if (antitask.getStartTime() == task.getStartTime()) {
+                        return antitask;
+                    }
+                }
+            }
+        }
+
+        // No match found
+        return null;
     }
 
     public Task locateTask(String taskName) {
