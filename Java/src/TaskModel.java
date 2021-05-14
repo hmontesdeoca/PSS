@@ -86,7 +86,8 @@ public class TaskModel {
     }
 
     /**
-     * Return an anti-task associated with a given recurring task if found, return null if no match
+     * Return a single anti-task associated with a given recurring task if found, return null if no match.
+     * Note that there can be multiple anti-tasks associated for one recurring task.
      *
      * @param task is a RecurringTask object
      * @return AntiTask associated with the recurring task
@@ -313,11 +314,9 @@ public class TaskModel {
     }
 
     private boolean verifyRecurringDate(RecurringTask task) {
-        // TODO Should check if new task clashes with existing recurring tasks as well, not just transient tasks
-        // TODO If there is a clash, should also check if there is an anti-task that allows us to add this new recurring task
-
         //checking for weekly frequency
         if(task.getFrequency()==7){
+            // Check for conflict with transient tasks
             for (int i = 0; i < transientTasks.size(); i++) {
                 TransientTask currentTask = transientTasks.get(i);
                 //check if any transient tasks have the same day of the week as this recurring task
@@ -342,9 +341,30 @@ public class TaskModel {
                     }
                 }
             }
+
+            // Check for conflict with other recurring tasks
+            for (RecurringTask recTask : recurringTasks) {
+                // First check if they occur on same day
+                if (getDayOfWeek(recTask.getStartDate()) == getDayOfWeek(task.getStartDate())) {
+                    // Now check if the dates overlap
+                    if (datesOverlap(recTask, task)) {
+                        // Now check for time overlap (subroutine?)
+                        if ((task.getStartTime() >= recTask.getStartTime() && task.getStartTime() < recTask.getEndTime())
+                                || (task.getEndTime() > recTask.getStartTime() && task.getEndTime() <= recTask.getEndTime())
+                                || (task.getStartTime() <= recTask.getStartTime() && task.getEndTime() >= recTask.getEndTime())) {
+                            // There is a time overlap, check if there is an anti-task that makes this ok
+                            if (getMatchingAntiTask(recTask) == null) {  // if no anti-task
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
         }
+
         //checking for daily frequency
         else{
+            // Check for conflict with transient tasks
             for (int i = 0; i < transientTasks.size(); i++){
                 TransientTask currentTask = transientTasks.get(i);
                 //checking if it falls in the range of the recurring task INCLUDING SAME DAY ("<= or >=")
@@ -369,7 +389,54 @@ public class TaskModel {
                     System.out.println("3rd cond checked");
                 }
             }
+
+            // Check for conflict with other recurring tasks
+            for (RecurringTask recTask : recurringTasks) {
+                // First check if dates overlap
+                if (datesOverlap(recTask, task)) {
+                    // Now check if times overlap (move to subroutine?)
+                    if ((task.getStartTime() >= recTask.getStartTime() && task.getStartTime() < recTask.getEndTime())
+                            || (task.getEndTime() > recTask.getStartTime() && task.getEndTime() <= recTask.getEndTime())
+                            || (task.getStartTime() <= recTask.getStartTime() && task.getEndTime() >= recTask.getEndTime())) {
+                        // Times overlap, see if there is an anti-task that makes this ok
+                        if (getMatchingAntiTask(recTask) == null) {
+                            return false;
+                        }
+                    }
+                }
+            }
         }
         return true;
+    }
+
+    /**
+     * Return true if there is a date overlap between the two given recurring tasks, false otherwise
+     * @param task1 is the first RecurringTask object
+     * @param task2 is the second RecurringTask object
+     * @return boolean true if there is overlap, false if not
+     */
+    private boolean datesOverlap(RecurringTask task1, RecurringTask task2) {
+        // task2 starts before task1 but ends during task1
+        if (task2.getStartDate() <= task1.getStartDate() && task2.getEndDate() <= task1.getEndDate()) {
+            return true;
+        }
+
+        // task2 starts during task1 and ends after task1
+        else if (task2.getStartDate() >= task1.getStartDate() && task2.getEndDate() >= task1.getEndDate()) {
+            return true;
+        }
+
+        // task2 starts and ends during task1
+        else if (task2.getStartDate() >= task1.getStartDate() && task2.getEndDate() <= task1.getEndDate()) {
+            return true;
+        }
+
+        // task1 starts and ends during task2
+        else if (task1.getStartDate() >= task2.getStartDate() && task1.getEndDate() <= task2.getEndDate()) {
+            return true;
+        }
+
+        // No overlap
+        return false;
     }
 }
