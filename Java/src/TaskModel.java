@@ -28,7 +28,17 @@ public class TaskModel {
 
             // Deleting an anti-task
             else if (result instanceof AntiTask) {
-                // TODO
+                // First find the recurring task associated with this anti-task
+                RecurringTask associatedRecTask = getMatchingRecTask((AntiTask) result);
+
+                // No conflict recurring tasks or transient tasks. verifyRecurringDate should return true if the passed recurring task doesn't clash with any recurring tasks or transient tasks
+                if (verifyRecurringDate(associatedRecTask)) {
+                    antiTasks.remove(result);
+                }
+
+                else {
+                    System.out.println("ERROR: Cannot delete anti-task");
+                }
             }
 
             // Deleting a transient task
@@ -42,6 +52,37 @@ public class TaskModel {
             System.out.println("Task to delete does not exist");
         }
 
+    }
+
+    /**
+     * Return a recurring task associated with the given anti-task, return null if no match
+     *
+     * @param task is an AntiTask object
+     * @return RecurringTask associated with the anti-task
+     */
+    private RecurringTask getMatchingRecTask(AntiTask task) {
+        for (RecurringTask recTask : recurringTasks) {
+            // If this recurring task is daily
+            if (recTask.getFrequency() == 1) {
+                if (recTask.getStartTime() == task.getStartTime()) {
+                    return recTask;
+                }
+            }
+
+            // Recurring task is weekly
+            else {
+                // First check if day matches
+                if (getDayOfWeek(recTask.getStartDate()) == getDayOfWeek(task.getDate())) {
+                    // Match if time is also the same
+                    if (recTask.getStartTime() == task.getStartTime()) {
+                        return recTask;
+                    }
+                }
+            }
+        }
+
+        // No match found
+        return null;
     }
 
     /**
@@ -272,6 +313,9 @@ public class TaskModel {
     }
 
     private boolean verifyRecurringDate(RecurringTask task) {
+        // TODO Should check if new task clashes with existing recurring tasks as well, not just transient tasks
+        // TODO If there is a clash, should also check if there is an anti-task that allows us to add this new recurring task
+
         //checking for weekly frequency
         if(task.getFrequency()==7){
             for (int i = 0; i < transientTasks.size(); i++) {
