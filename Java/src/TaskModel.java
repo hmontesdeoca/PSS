@@ -137,8 +137,11 @@ public class TaskModel {
     }
 
     public void createTransientTask(String name, String type, float startTime, float duration, int date) {
-        if(verifyTransientDate(new TransientTask(name, type, startTime, duration, date)))
-            transientTasks.add(new TransientTask(name, type, startTime, duration, date));
+        TransientTask transientTask = new TransientTask(name, type, startTime, duration, date);
+        if(verifyTransientDate(transientTask)) {
+            transientTasks.add(transientTask);
+            taskList.add(transientTask);
+        }
     }
 
     public void createAntiTask(String name, String type, float startTime, float duration, int date) {
@@ -149,8 +152,11 @@ public class TaskModel {
     }
 
     public void createRecurringTask(String name, String type, float startTime, float duration, int startDate, int endDate, int frequency) {
-        if(verifyRecurringDate(new RecurringTask(name,type, startTime, duration, startDate, endDate, frequency)))
-            recurringTasks.add(new RecurringTask(name,type, startTime, duration, startDate, endDate, frequency));
+        RecurringTask rec = new RecurringTask(name, type, startTime, duration, startDate, endDate, frequency);
+        if(verifyRecurringDate(rec)) {
+            recurringTasks.add(rec);
+            taskList.add(rec);
+        }
     }
 
     /**

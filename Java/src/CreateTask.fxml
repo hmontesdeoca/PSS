@@ -17,7 +17,7 @@
       <VBox alignment="TOP_CENTER" layoutX="-1.0" layoutY="-2.0" onMouseEntered="#checkStartDate" prefHeight="669.0" prefWidth="443.0" spacing="20.0">
          <children>
             <Label text="Task Name" />
-            <TextField fx:id="taskName" maxWidth="-Infinity" minWidth="-Infinity" onKeyPressed="#checkName" prefWidth="150.0" />
+            <TextField fx:id="taskName" maxWidth="-Infinity" minWidth="-Infinity" onKeyPressed="#checkName" onKeyReleased="#checkName" onKeyTyped="#checkName" prefWidth="150.0" />
             <Label text="Date" />
             <DatePicker fx:id="taskStartDate" onAction="#checkStartDate" prefWidth="150.0" />
             <Label text="Start Time" />
@@ -64,7 +64,7 @@
             <Label text="End Date" />
             <DatePicker fx:id="taskEndDate" disable="true" onAction="#checkEndDate" prefWidth="150.0" />
             <Button fx:id="addTaskButton" disable="true" mnemonicParsing="false" onAction="#addTask" text="Add Task!" />
-            <Label id="createError" disable="true" textFill="#ee0404" />
+            <Label id="createError" fx:id="errorLabel" disable="true" textFill="#ee0404" />
          </children>
          <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="20.0" />

@@ -80,7 +80,7 @@ public class TaskController {
 
     //Main Scene Methods
     public void createTask() throws IOException {
-        //TODO: find a way to recieve the taskmodel from the other fxml loader, load and display tasks to the calendar
+        //TODO: display tasks to calendar
         FXMLLoader load = new FXMLLoader(getClass().getResource("CreateTask.FXML"));
         Stage stage2 = new Stage();
         stage2.setScene(new Scene(load.load()));
@@ -88,8 +88,6 @@ public class TaskController {
         temp.setTaskModel(taskModel);
         taskModel = temp.getTaskModel();
         stage2.show();
-        taskModel.printArrays();
-
     }
 
     public void editTask(){
@@ -100,6 +98,9 @@ public class TaskController {
 
     }
 
+    public void updateCalendar(){
+
+    }
     /**
      * Remove all tasks from our schedule
      */

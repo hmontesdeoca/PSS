@@ -1,16 +1,10 @@
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
-
-import java.io.IOException;
 import java.time.LocalDate;
 
 public class CreateController {
     //Task Model
-    private TaskModel model = new TaskModel();
+    private TaskModel model;
 
     //flags
     boolean validName = false;
@@ -47,6 +41,8 @@ public class CreateController {
     private DatePicker taskEndDate;
     @FXML
     private Button addTaskButton;
+    @FXML
+    private Label errorLabel;
 
     //no arg constructor
     public CreateController() {
@@ -74,8 +70,13 @@ public class CreateController {
 
     public void checkName() {
         String current = taskName.getText();
-        if (model.verifyName(current))
+        if (model.verifyName(current)) {
             validName = true;
+        }
+        else {
+            errorLabel.setText("NAME TAKEN");
+            validName = false;
+        }
         enableButton();
     }
 
