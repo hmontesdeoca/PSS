@@ -1,5 +1,11 @@
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
+
+import java.io.IOException;
 import java.time.LocalDate;
 
 public class CreateController {
@@ -55,9 +61,14 @@ public class CreateController {
         startTimeCombo.getItems().addAll("AM", "PM");
         endTimeCombo.getItems().addAll("AM", "PM");
     }
-    public TaskModel getTaskModel(){
-        return model;
+
+    public void setTaskModel(TaskModel model){
+        this.model = model;
     }
+    public TaskModel getTaskModel(){
+        return this.model;
+    }
+
     public void checkName() {
         String current = taskName.getText();
         if (model.verifyName(current))
@@ -155,8 +166,8 @@ public class CreateController {
             int date = Integer.parseInt(taskStartDate.getValue().toString().replace("-", ""));
 
             model.createTransientTask(name, "other",startTime, duration, date);
-            //model.printArrays();
         }
+
 
     }
 }

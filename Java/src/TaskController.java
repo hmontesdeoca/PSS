@@ -27,7 +27,7 @@ public class TaskController {
     public static final List<String> antiTypes = Collections.unmodifiableList(Arrays.asList("Cancellation"));
 
     // Have one single instance of TaskModel
-    TaskModel taskModel = new TaskModel();
+    private TaskModel taskModel = new TaskModel();
 
     String[] months = {"",
             "January", "February", "March",
@@ -81,10 +81,15 @@ public class TaskController {
     //Main Scene Methods
     public void createTask() throws IOException {
         //TODO: find a way to recieve the taskmodel from the other fxml loader, load and display tasks to the calendar
-        Parent root = FXMLLoader.load(getClass().getResource("CreateTask.fxml"));
+        FXMLLoader load = new FXMLLoader(getClass().getResource("CreateTask.FXML"));
         Stage stage2 = new Stage();
-        stage2.setScene(new Scene(root));
+        stage2.setScene(new Scene(load.load()));
+        CreateController temp = load.getController();
+        temp.setTaskModel(taskModel);
+        taskModel = temp.getTaskModel();
         stage2.show();
+        taskModel.printArrays();
+
     }
 
     public void editTask(){
