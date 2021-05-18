@@ -118,15 +118,21 @@ public class CreateController {
         } else if (transeintRadio.isSelected()) {
             taskEndDate.setDisable(true);
             radioSelected = true;
+            freq=false;
         }
         enableButton();
     }
 
     public void enableButton() {
-        if(validName && startDateChosen && startTimeChosen && endTimeChosen && radioSelected)
-            if(!freq){
+        if(validName && startDateChosen && startTimeChosen && endTimeChosen && radioSelected && !freq)
+            addTaskButton.setDisable(false);
+        else if(validName && startDateChosen && startTimeChosen && endTimeChosen && radioSelected && freq && endDateChosen)
+            addTaskButton.setDisable(false);
+        else
+            addTaskButton.setDisable(true);
+    }
 
-            }
+    public void addTask(){
 
     }
 }
