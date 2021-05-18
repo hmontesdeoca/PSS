@@ -19,21 +19,21 @@
             <Label text="Task Name" />
             <TextField fx:id="taskName" maxWidth="-Infinity" minWidth="-Infinity" onKeyPressed="#checkName" prefWidth="150.0" />
             <Label text="Date" />
-            <DatePicker fx:id="taskStartDate" prefWidth="150.0" />
+            <DatePicker fx:id="taskStartDate" onAction="#checkStartDate" prefWidth="150.0" />
             <Label text="Start Time" />
             <HBox alignment="CENTER" prefHeight="37.0" prefWidth="415.0">
                <children>
-                  <ComboBox fx:id="startHour" prefHeight="25.0" prefWidth="73.0" />
-                  <ComboBox fx:id="startMin" prefHeight="25.0" prefWidth="76.0" />
-                  <ComboBox id="combo_AMPM" fx:id="startTimeCombo" maxWidth="70.0" prefHeight="25.0" prefWidth="70.0" />
+                  <ComboBox fx:id="startHour" onAction="#checkStartTime" prefHeight="25.0" prefWidth="73.0" />
+                  <ComboBox fx:id="startMin" onAction="#checkStartTime" prefHeight="25.0" prefWidth="76.0" />
+                  <ComboBox id="combo_AMPM" fx:id="startTimeCombo" maxWidth="70.0" onAction="#checkStartTime" prefHeight="25.0" prefWidth="70.0" />
                </children>
             </HBox>
             <Label text="End TIme" />
             <HBox alignment="CENTER" prefHeight="37.0" prefWidth="415.0">
                <children>
-                  <ComboBox fx:id="endHour" prefHeight="25.0" prefWidth="76.0" />
-                  <ComboBox fx:id="endMin" prefHeight="25.0" prefWidth="76.0" />
-                  <ComboBox fx:id="endTimeCombo" prefHeight="25.0" prefWidth="76.0" />
+                  <ComboBox fx:id="endHour" onAction="#checkEndTime" prefHeight="25.0" prefWidth="76.0" />
+                  <ComboBox fx:id="endMin" onAction="#checkEndTime" prefHeight="25.0" prefWidth="76.0" />
+                  <ComboBox fx:id="endTimeCombo" onAction="#checkEndTime" prefHeight="25.0" prefWidth="76.0" />
                </children>
             </HBox>
             <HBox alignment="CENTER" prefHeight="50.0" prefWidth="415.0">
@@ -62,8 +62,8 @@
                </padding>
             </HBox>
             <Label text="End Date" />
-            <DatePicker fx:id="taskEndDate" disable="true" prefWidth="150.0" />
-            <Button disable="true" mnemonicParsing="false" text="Add Task!" />
+            <DatePicker fx:id="taskEndDate" disable="true" onAction="#checkEndDate" prefWidth="150.0" />
+            <Button fx:id="addTaskButton" disable="true" mnemonicParsing="false" text="Add Task!" />
             <Label id="createError" disable="true" textFill="#ee0404" />
          </children>
          <padding>

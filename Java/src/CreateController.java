@@ -7,21 +7,22 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.time.LocalDate;
-public class CreateController
-{
+
+public class CreateController {
     //Task Model
     TaskModel model = new TaskModel();
 
     //flags
-    boolean validName=false;
-    boolean startDateChosen=false;
-    boolean startTimeChosen=false;
-    boolean endTimeChosen=false;
-    boolean freq=false;
-    boolean endDateChosen=false;
-
+    boolean validName = false;
+    boolean startDateChosen = false;
+    boolean startTimeChosen = false;
+    boolean endTimeChosen = false;
+    boolean freq = false;
+    boolean endDateChosen = false;
+    boolean radioSelected = false;
     //create Task Scene
     @FXML
     private TextField taskName;
@@ -38,8 +39,6 @@ public class CreateController
     @FXML
     private ComboBox endMin;
     @FXML
-    private ComboBox getEndTimeCombo;
-    @FXML
     private ComboBox endTimeCombo;
     @FXML
     private RadioButton transeintRadio;
@@ -49,56 +48,85 @@ public class CreateController
     private RadioButton recurringWeeklyRadio;
     @FXML
     private DatePicker taskEndDate;
+    @FXML
+    private Button addTaskButton;
 
     //no arg constructor
-    public CreateController(){
+    public CreateController() {
 
     }
+
     @FXML
-    public void initialize(){
-        startHour.getItems().addAll(1,2,3,4,5,6,7,8,9,10,11,12);
-        endHour.getItems().addAll(1,2,3,4,5,6,7,8,9,10,11,12);
+    public void initialize() {
+        startHour.getItems().addAll(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+        endHour.getItems().addAll(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
 
-        startMin.getItems().addAll("00","30");
-        endMin.getItems().addAll("00","30");
+        startMin.getItems().addAll("00", "30");
+        endMin.getItems().addAll("00", "30");
 
-        startTimeCombo.getItems().addAll("AM","PM");
-        endTimeCombo.getItems().addAll("AM","PM");
-
+        startTimeCombo.getItems().addAll("AM", "PM");
+        endTimeCombo.getItems().addAll("AM", "PM");
     }
 
-    public void checkName(){
+    public void checkName() {
         String current = taskName.getText();
-        if(model.verifyName(current))
-            validName=true;
+        if (model.verifyName(current))
+            validName = true;
+        enableButton();
     }
+
     //date picker frequency
-    public void checkStartDate(){
+    public void checkStartDate() {
         LocalDate date = taskStartDate.getValue();
-        if(date!=null)
-            startDateChosen=true;
+        if (date != null)
+            startDateChosen = true;
+        enableButton();
     }
+
     //date picker frequency
-    public void checkEndDate(){
+    public void checkEndDate() {
         //if we have a task with frequency
-        if(freq){
+        if (freq) {
             LocalDate date = taskEndDate.getValue();
-            if(date!=null)
-                endDateChosen=true;
+            if (date != null)
+                endDateChosen = true;
         }
+        enableButton();
     }
-    public void checkTimes(){
+
+    public void checkStartTime() {
+        if (startTimeCombo.getValue() != null && startTimeCombo.getValue() != null
+                && startMin.getValue() != null && startHour.getValue() != null)
+            startTimeChosen = true;
+        enableButton();
+    }
+
+    public void checkEndTime() {
+        if (endTimeCombo.getValue() != null && endTimeCombo.getValue() != null
+                && endMin.getValue() != null && endHour.getValue() != null)
+            endTimeChosen = true;
+        enableButton();
+    }
 
 
-    }
     //check the frequency, assign it, and enable or disable the button
-    public void checkFrequency(){
-        if(recurringWeeklyRadio.isSelected() || recurringDailyRadio.isSelected()) {
+    public void checkFrequency() {
+        if (recurringWeeklyRadio.isSelected() || recurringDailyRadio.isSelected()) {
             freq = true;
             taskEndDate.setDisable(false);
-        }
-        else if(transeintRadio.isSelected())
+            radioSelected = true;
+        } else if (transeintRadio.isSelected()) {
             taskEndDate.setDisable(true);
+            radioSelected = true;
+        }
+        enableButton();
+    }
+
+    public void enableButton() {
+        if(validName && startDateChosen && startTimeChosen && endTimeChosen && radioSelected)
+            if(!freq){
+
+            }
 
     }
 }

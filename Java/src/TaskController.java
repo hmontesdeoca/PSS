@@ -94,20 +94,13 @@ public class TaskController {
 
     }
 
-<<<<<<< HEAD
-    //Create Task Methods
-    public void checkName(){
-        System.out.println("obama");
-=======
-    /**
-     * Clear schedule
-     */
     public void resetSchedule() {
     }
 
     /**
      * Read the schedule from a JSON file
      */
+
     public void loadSchedule() {
         // Possibly call resetSchedule() here if we're loading a new one?
 
@@ -182,6 +175,5 @@ public class TaskController {
 
         String prefix = "Java/src/";  // Can modify this depending on where json file is being stored
         return prefix + userInput;
->>>>>>> 38f0c9f6d11fac623b02cbc097e0b0cc7e30a2d0
     }
 }
