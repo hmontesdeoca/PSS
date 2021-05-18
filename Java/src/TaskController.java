@@ -95,13 +95,18 @@ public class TaskController {
 
     }
 
+    /**
+     * Remove all tasks from our schedule
+     */
     public void resetSchedule() {
+        taskModel.transientTasks.clear();
+        taskModel.recurringTasks.clear();
+        taskModel.antiTasks.clear();
     }
 
     /**
      * Read the schedule from a JSON file
      */
-
     public void loadSchedule() {
         // Possibly call resetSchedule() here if we're loading a new one?
 
@@ -164,7 +169,7 @@ public class TaskController {
     }
 
     /**
-     * Write schedule to file
+     * Write schedule to JSON file
      */
     public void exportSchedule() {
         // Get valid file name from user
@@ -230,10 +235,18 @@ public class TaskController {
     }
 
     public String getFileName() {
-        // Implement code to grab string using GUI here?
+        // Implement code to grab string from GUI here?
         String userInput = "Set1.json"; //test value for now
 
-        String prefix = "Java/src/";  // Can modify this depending on where json file is being stored
-        return prefix + userInput;
+        // Validate that file is JSON
+        String extension = userInput.split("[.]")[1];
+        if (extension.equals("json")) {
+            return userInput;
+        }
+
+        else {
+            System.out.println("ERROR: invalid file extension");
+            return null;
+        }
     }
 }
