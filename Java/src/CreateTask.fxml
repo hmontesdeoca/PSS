@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
@@ -11,25 +12,33 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="435.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="669.0" prefWidth="443.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CreateController">
    <children>
-      <VBox alignment="TOP_CENTER" layoutX="-1.0" layoutY="-2.0" prefHeight="474.0" prefWidth="435.0" spacing="20.0">
+      <VBox alignment="TOP_CENTER" layoutX="-1.0" layoutY="-2.0" onMouseEntered="#checkStartDate" prefHeight="669.0" prefWidth="443.0" spacing="20.0">
          <children>
             <Label text="Task Name" />
-            <TextField maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
+            <TextField fx:id="taskName" maxWidth="-Infinity" minWidth="-Infinity" onKeyPressed="#checkName" prefWidth="150.0" />
             <Label text="Date" />
-            <DatePicker prefWidth="150.0" />
-            <Label text="Time" />
+            <DatePicker fx:id="taskStartDate" prefWidth="150.0" />
+            <Label text="Start Time" />
             <HBox alignment="CENTER" prefHeight="37.0" prefWidth="415.0">
                <children>
-                  <TextField id="timeTextField" maxWidth="-Infinity" prefWidth="110.0" />
-                  <ComboBox id="combo_AMPM" maxWidth="20.0" prefWidth="30.0" />
+                  <ComboBox fx:id="startHour" prefHeight="25.0" prefWidth="73.0" />
+                  <ComboBox fx:id="startMin" prefHeight="25.0" prefWidth="76.0" />
+                  <ComboBox id="combo_AMPM" fx:id="startTimeCombo" maxWidth="70.0" prefHeight="25.0" prefWidth="70.0" />
+               </children>
+            </HBox>
+            <Label text="End TIme" />
+            <HBox alignment="CENTER" prefHeight="37.0" prefWidth="415.0">
+               <children>
+                  <ComboBox fx:id="endHour" prefHeight="25.0" prefWidth="76.0" />
+                  <ComboBox fx:id="endMin" prefHeight="25.0" prefWidth="76.0" />
+                  <ComboBox fx:id="endTimeCombo" prefHeight="25.0" prefWidth="76.0" />
                </children>
             </HBox>
             <HBox alignment="CENTER" prefHeight="50.0" prefWidth="415.0">
                <children>
-                  <RadioButton mnemonicParsing="false" text="One-Time">
+                  <RadioButton fx:id="transeintRadio" mnemonicParsing="false" onAction="#checkFrequency" text="One-Time">
                      <padding>
                         <Insets left="10.0" right="10.0" />
                      </padding>
@@ -37,12 +46,12 @@
                         <ToggleGroup fx:id="frequency" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="Daily" toggleGroup="$frequency">
+                  <RadioButton fx:id="recurringDailyRadio" mnemonicParsing="false" onAction="#checkFrequency" text="Daily" toggleGroup="$frequency">
                      <padding>
                         <Insets left="10.0" right="10.0" />
                      </padding>
                   </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="Weekly" toggleGroup="$frequency">
+                  <RadioButton fx:id="recurringWeeklyRadio" mnemonicParsing="false" onAction="#checkFrequency" text="Weekly" toggleGroup="$frequency">
                      <padding>
                         <Insets left="10.0" right="10.0" />
                      </padding>
@@ -53,7 +62,8 @@
                </padding>
             </HBox>
             <Label text="End Date" />
-            <DatePicker disable="true" prefWidth="150.0" />
+            <DatePicker fx:id="taskEndDate" disable="true" prefWidth="150.0" />
+            <Button disable="true" mnemonicParsing="false" text="Add Task!" />
             <Label id="createError" disable="true" textFill="#ee0404" />
          </children>
          <padding>

@@ -182,7 +182,7 @@ public class TaskModel {
                 (2 * century) + year + Math.floor(year / 4.0) + Math.floor(century / 4.0)), 7);
     }
 
-    private boolean verifyName(String taskName) {
+    public boolean verifyName(String taskName) {
         for (int i = 0; i < taskList.size(); i++) {
             if (taskList.get(i).getName().equals(taskName))
                 return false;
