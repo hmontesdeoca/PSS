@@ -63,7 +63,7 @@
             </HBox>
             <Label text="End Date" />
             <DatePicker fx:id="taskEndDate" disable="true" onAction="#checkEndDate" prefWidth="150.0" />
-            <Button fx:id="addTaskButton" disable="true" mnemonicParsing="false" text="Add Task!" />
+            <Button fx:id="addTaskButton" disable="true" mnemonicParsing="false" onAction="#addTask" text="Add Task!" />
             <Label id="createError" disable="true" textFill="#ee0404" />
          </children>
          <padding>

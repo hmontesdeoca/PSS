@@ -1,19 +1,10 @@
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
-
-import java.io.IOException;
 import java.time.LocalDate;
 
 public class CreateController {
     //Task Model
-    TaskModel model = new TaskModel();
+    private TaskModel model = new TaskModel();
 
     //flags
     boolean validName = false;
@@ -29,13 +20,13 @@ public class CreateController {
     @FXML
     private DatePicker taskStartDate;
     @FXML
-    private ComboBox startHour;
+    private ComboBox<Float> startHour;
     @FXML
     private ComboBox startMin;
     @FXML
     private ComboBox startTimeCombo;
     @FXML
-    private ComboBox endHour;
+    private ComboBox<Float> endHour;
     @FXML
     private ComboBox endMin;
     @FXML
@@ -52,14 +43,11 @@ public class CreateController {
     private Button addTaskButton;
 
     //no arg constructor
-    public CreateController() {
-
-    }
-
+    public CreateController(){}
     @FXML
     public void initialize() {
-        startHour.getItems().addAll(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
-        endHour.getItems().addAll(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+        startHour.getItems().addAll(1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 11f, 12f);
+        endHour.getItems().addAll(1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 11f, 12f);
 
         startMin.getItems().addAll("00", "30");
         endMin.getItems().addAll("00", "30");
@@ -67,7 +55,9 @@ public class CreateController {
         startTimeCombo.getItems().addAll("AM", "PM");
         endTimeCombo.getItems().addAll("AM", "PM");
     }
-
+    public TaskModel getTaskModel(){
+        return model;
+    }
     public void checkName() {
         String current = taskName.getText();
         if (model.verifyName(current))
@@ -133,6 +123,40 @@ public class CreateController {
     }
 
     public void addTask(){
+        if(freq)
+            if(recurringWeeklyRadio.isSelected()){
+
+            }
+            else{
+
+                }
+        else{
+            //grab task name
+            String name = taskName.getText();
+
+            float startTime = (float) startHour.getValue();
+            //if time is PM then add 12 for 24 hour format
+            if(startTimeCombo.equals("pm"))
+                startTime+=12.0f;
+            //if it is at 30 minutes add 0.5 to float for format
+            if(startMin.equals("30"))
+                startTime+=0.5f;
+
+            float endTime = (float) endHour.getValue();
+            //if time is PM then add 12 for 24 hour format
+            if(endTimeCombo.equals("pm"))
+                endTime+=12.0f;
+            //if it is at 30 minutes add 0.5 to float for format
+            if(endMin.equals("30"))
+                endTime+=0.5f;
+
+            //duration
+            float duration = endTime-startTime;
+            int date = Integer.parseInt(taskStartDate.getValue().toString().replace("-", ""));
+
+            model.createTransientTask(name, "other",startTime, duration, date);
+            //model.printArrays();
+        }
 
     }
 }

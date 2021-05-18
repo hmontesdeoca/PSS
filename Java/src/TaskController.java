@@ -25,7 +25,8 @@ public class TaskController {
     public static final List<String> recurringTypes = Collections.unmodifiableList(Arrays.asList("Class", "Study", "Sleep", "Exercise", "Work", "Meal"));
     public static final List<String> antiTypes = Collections.unmodifiableList(Arrays.asList("Cancellation"));
 
-    TaskModel taskModel = new TaskModel();  // Have one single instance of TaskModel
+    // Have one single instance of TaskModel
+    TaskModel taskModel = new TaskModel();
 
     String[] months = {"",
             "January", "February", "March",
@@ -44,8 +45,6 @@ public class TaskController {
     private GridPane calendarPane;
     @FXML
     private Label viewByLabel;
-
-
 
     //No Args constructor required
     public TaskController() {
@@ -80,6 +79,7 @@ public class TaskController {
 
     //Main Scene Methods
     public void createTask() throws IOException {
+        //TODO: find a way to recieve the taskmodel from the other fxml loader, load and display tasks to the calendar
         Parent root = FXMLLoader.load(getClass().getResource("CreateTask.fxml"));
         Stage stage2 = new Stage();
         stage2.setScene(new Scene(root));
