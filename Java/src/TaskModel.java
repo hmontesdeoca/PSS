@@ -2,9 +2,9 @@ import java.util.ArrayList;
 
 public class TaskModel {
     private ArrayList<Task> taskList = new ArrayList<>();
-    private ArrayList<TransientTask> transientTasks = new ArrayList<>();
-    private ArrayList<AntiTask> antiTasks = new ArrayList<>();
-    private ArrayList<RecurringTask> recurringTasks = new ArrayList<>();
+    ArrayList<TransientTask> transientTasks = new ArrayList<>();
+    ArrayList<AntiTask> antiTasks = new ArrayList<>();
+    ArrayList<RecurringTask> recurringTasks = new ArrayList<>();
 
     public void editTask(Task task) {
 

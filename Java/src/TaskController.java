@@ -7,6 +7,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import org.json.simple.JSONArray;
@@ -167,6 +168,65 @@ public class TaskController {
      */
     public void exportSchedule() {
         // Get valid file name from user
+        String fileName = getFileName();
+
+        try {
+            // Open file
+            FileWriter fileWriter = new FileWriter(fileName);
+
+            JSONArray jsonArray = new JSONArray();
+
+            // Iterate through all transient tasks
+            for (TransientTask task : taskModel.transientTasks) {
+                // Convert TransientTask object to a JSON object
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("Name", task.getName());
+                jsonObject.put("Type", task.getType());
+                jsonObject.put("Date", task.getDate());
+                jsonObject.put("StartTime", task.getStartTime());
+                jsonObject.put("Duration", task.getDuration());
+
+                // Add to JSON array
+                jsonArray.add(jsonObject);
+            }
+
+            // Write all recurring tasks
+            for (RecurringTask task : taskModel.recurringTasks) {
+                // Convert RecurringTask object to a JSON object
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("Name", task.getName());
+                jsonObject.put("Type", task.getType());
+                jsonObject.put("StartDate", task.getStartDate());
+                jsonObject.put("StartTime", task.getStartTime());
+                jsonObject.put("Duration", task.getDuration());
+                jsonObject.put("EndDate", task.getEndDate());
+                jsonObject.put("Frequency", task.getFrequency());
+
+                // Add to JSON array
+                jsonArray.add(jsonObject);
+            }
+
+            // Write all anti-tasks
+            for (AntiTask task : taskModel.antiTasks) {
+                // Convert AntiTask object to a JSON object
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("Name", task.getName());
+                jsonObject.put("Type", task.getType());
+                jsonObject.put("Date", task.getDate());
+                jsonObject.put("StartTime", task.getStartTime());
+                jsonObject.put("Duration", task.getDuration());
+
+                // Add to JSON array
+                jsonArray.add(jsonObject);
+            }
+
+            // Write JSON array to the file
+            fileWriter.write(jsonArray.toJSONString());
+            fileWriter.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getFileName() {
