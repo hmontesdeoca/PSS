@@ -273,24 +273,27 @@ public class TaskModel {
                 //checking if it falls in the range of the recurring task INCLUDING SAME DAY ("<= or >=")
                 if(task.getDate() <= recTask.getEndDate() && task.getDate() >= recTask.getStartDate()){
                     //check if they have any overlapping times
-                    float currentTaskStartTime = task.getStartTime();
-                    float currentTaskEndTime = task.getEndTime();
+                    float currentTaskStartTime = recTask.getStartTime();
+                    float currentTaskEndTime = recTask.getEndTime();
 
                     //This disqualifies same start time, and the task to be added is in the duration of another task
                     if (task.getStartTime() >= currentTaskStartTime && task.getStartTime() < currentTaskEndTime) {
                         System.out.println("conflict with: "+ recTask.getName());
+                        System.out.println("CONDITION 1");
                         return false;
                     }
 
                     //is the task has a duration that bleeds onto another task
                     if (task.getEndTime() > currentTaskStartTime && task.getEndTime() <= currentTaskEndTime) {
                         System.out.println("conflict with: "+ recTask.getName());
+                        System.out.println("CONDITION 2");
                         return false;
                     }
 
                     // Case where task to be added starts before current task and ends after current task
                     if (task.getStartTime() <= currentTaskStartTime && task.getEndTime() >= currentTaskEndTime) {
                         System.out.println("conflict with: "+ recTask.getName());
+                        System.out.println("CONDITION 3");
                         return false;
                     }
                 }

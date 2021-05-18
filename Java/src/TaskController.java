@@ -87,8 +87,10 @@ public class TaskController {
         Stage stage2 = new Stage();
         stage2.setScene(new Scene(load.load()));
         CreateController temp = load.getController();
+
         temp.setTaskModel(taskModel);
         taskModel = temp.getTaskModel();
+
         stage2.show();
         updateCalendar();
     }

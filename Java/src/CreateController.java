@@ -174,10 +174,14 @@ public class CreateController {
             //if this is weekly
             if (recurringWeeklyRadio.isSelected()) {
                 model.createRecurringTask(name, "other", startTime, duration, date, endDate, 7);
+                System.out.println("STARTTIME: "+startTime);
+                System.out.println("ENDTIME: " + endTime);
             }
             //if this is daily
             else
                 model.createRecurringTask(name, "other", startTime, duration, date, endDate, 1);
+                System.out.println("STARTTIME: "+startTime);
+                System.out.println("ENDTIME: " + endTime);
         }
         //if the task is transient
         else {
