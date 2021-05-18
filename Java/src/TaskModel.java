@@ -158,7 +158,7 @@ public class TaskModel {
      * @param date is an int in the form YYYYMMDD
      * @return Day of the week as integer
      */
-    private int getDayOfWeek(int date) {
+    public static int getDayOfWeek(int date) {
         int day = date % 100;
         date /= 100;
         int month = (date % 100);
