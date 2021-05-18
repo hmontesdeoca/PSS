@@ -144,7 +144,7 @@ public class CreateController {
 
         float startTime = (float) startHour.getValue();
         //if time is PM then add 12 for 24 hour format
-        if (startTimeCombo.equals("pm"))
+        if (startTimeCombo.equals("PM") && startHour.getValue()!=12.0)
             startTime += 12.0f;
         //if it is at 30 minutes add 0.5 to float for format
         if (startMin.equals("30"))
@@ -152,7 +152,7 @@ public class CreateController {
 
         float endTime = (float) endHour.getValue();
         //if time is PM then add 12 for 24 hour format
-        if (endTimeCombo.equals("pm"))
+        if (endTimeCombo.equals("PM") && endHour.getValue()!=12.0)
             endTime += 12.0f;
         //if it is at 30 minutes add 0.5 to float for format
         if (endMin.equals("30"))

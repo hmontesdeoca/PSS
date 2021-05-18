@@ -7,14 +7,18 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +29,7 @@ public class TaskController {
     public static final List<String> transientTypes = Collections.unmodifiableList(Arrays.asList("Visit", "Shopping", "Appointment"));
     public static final List<String> recurringTypes = Collections.unmodifiableList(Arrays.asList("Class", "Study", "Sleep", "Exercise", "Work", "Meal"));
     public static final List<String> antiTypes = Collections.unmodifiableList(Arrays.asList("Cancellation"));
-
+    public ArrayList<String> inCalendar = new ArrayList<>();
     // Have one single instance of TaskModel
     private TaskModel taskModel = new TaskModel();
 
@@ -60,18 +64,17 @@ public class TaskController {
 
         //grab current date
         LocalDate firstOfTheMonth = java.time.LocalDate.of(year, month, 1);
-        String str = firstOfTheMonth.toString().replace("-","");
+        String str = firstOfTheMonth.toString().replace("-", "");
 
         //grab the fist day of the month of the week
         int firstDay = TaskModel.getDayOfWeek(Integer.parseInt(str));
-        firstDay+=7;
+        firstDay += 7;
 
         //iterate through 2D flattened array to properly add date
-        for(int i =firstDay; i <firstDay + days[month]; i++)
-        {
+        for (int i = firstDay; i < firstDay + days[month]; i++) {
             VBox temp = (VBox) calendarPane.getChildren().get(i);
             Text t = (Text) temp.getChildren().get(0);
-            t.setText(Integer.toString(i-firstDay+1));
+            t.setText(Integer.toString(i - firstDay + 1));
         }
 
         //set appropriate month
@@ -88,19 +91,58 @@ public class TaskController {
         temp.setTaskModel(taskModel);
         taskModel = temp.getTaskModel();
         stage2.show();
+        updateCalendar();
     }
 
-    public void editTask(){
-
-    }
-
-    public void deleteTask(){
+    public void editTask() {
 
     }
 
-    public void updateCalendar(){
+    public void deleteTask() {
 
     }
+
+    public void updateCalendar() {
+
+        for (int i = 0; i < taskModel.getTransientTasksList().size(); i++) {
+            TransientTask currentTask = taskModel.getTransientTasksList().get(i);
+            String date = String.valueOf(currentTask.getDate());
+
+            for (int j = 7; j < calendarPane.getChildren().size() - 1; j++) {
+                int vboxDay;
+                VBox temp = (VBox) calendarPane.getChildren().get(j);
+                try {
+                    vboxDay = Integer.parseInt(((Text) temp.getChildren().get(0)).getText());
+                } catch (NumberFormatException e) {
+                    vboxDay = 0;
+                }
+                if (vboxDay == Integer.parseInt(date.substring(6)) && !inCalendar.contains(currentTask.getName())) {
+                    temp.getChildren().add(new Text(currentTask.getName()));
+                    inCalendar.add(currentTask.getName());
+                }
+            }
+        }
+
+        for (int i = 0; i < taskModel.getRecurringTaskList().size(); i++) {
+            RecurringTask currentTask = taskModel.getRecurringTaskList().get(i);
+            String date = String.valueOf(currentTask.getStartDate());
+
+            for (int j = 7; j < calendarPane.getChildren().size() - 1; j++) {
+                int vboxDay;
+                VBox temp = (VBox) calendarPane.getChildren().get(j);
+                try {
+                    vboxDay = Integer.parseInt(((Text) temp.getChildren().get(0)).getText());
+                } catch (NumberFormatException e) {
+                    vboxDay = 0;
+                }
+                if (vboxDay == Integer.parseInt(date.substring(6)) && !inCalendar.contains(currentTask.getName())) {
+                    temp.getChildren().add(new Text(currentTask.getName()));
+                    inCalendar.add(currentTask.getName());
+                }
+            }
+        }
+    }
+
     /**
      * Remove all tasks from our schedule
      */
@@ -141,9 +183,7 @@ public class TaskController {
                     int date = (int) (long) task.get("Date");
 
                     taskModel.createTransientTask(name, type, startTime, duration, date);
-                }
-
-                else if (recurringTypes.contains(task.get("Type"))) {
+                } else if (recurringTypes.contains(task.get("Type"))) {
                     String name = (String) task.get("Name");
                     String type = (String) task.get("Type");
                     float startTime = (float) (long) task.get("StartTime");  // Need to cast twice from Object -> long -> float for some reason
@@ -153,9 +193,7 @@ public class TaskController {
                     int frequency = (int) (long) task.get("Frequency");
 
                     taskModel.createRecurringTask(name, type, startTime, duration, startDate, endDate, frequency);
-                }
-
-                else if (antiTypes.contains(task.get("Type"))) {
+                } else if (antiTypes.contains(task.get("Type"))) {
                     String name = (String) task.get("Name");
                     String type = (String) task.get("Type");
                     float startTime = (float) (long) task.get("StartTime");
@@ -163,9 +201,7 @@ public class TaskController {
                     int date = (int) (long) task.get("Date");
 
                     taskModel.createAntiTask(name, type, startTime, duration, date);
-                }
-
-                else {
+                } else {
                     System.out.println("ERROR: Type may not be valid?");
                 }
             });
@@ -248,9 +284,7 @@ public class TaskController {
         String extension = userInput.split("[.]")[1];
         if (extension.equals("json")) {
             return userInput;
-        }
-
-        else {
+        } else {
             System.out.println("ERROR: invalid file extension");
             return null;
         }
