@@ -54,7 +54,6 @@ public class TaskController {
     //No Args constructor required
     public TaskController() {
     }
-
     //initialize
     @FXML
     public void initialize() {

@@ -48,6 +48,7 @@ public class CreateController {
     public CreateController() {
     }
 
+    //initialize function for adding items
     @FXML
     public void initialize() {
         startHour.getItems().addAll(1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 11f, 12f);
@@ -59,7 +60,7 @@ public class CreateController {
         startTimeCombo.getItems().addAll("AM", "PM");
         endTimeCombo.getItems().addAll("AM", "PM");
     }
-
+    //setters and getters for task model
     public void setTaskModel(TaskModel model) {
         this.model = model;
     }
@@ -144,18 +145,20 @@ public class CreateController {
 
         float startTime = (float) startHour.getValue();
         //if time is PM then add 12 for 24 hour format
-        if (startTimeCombo.equals("PM") && startHour.getValue()!=12.0)
+        if (startTimeCombo.getValue().equals("PM") && startHour.getValue()!=12.0) {
             startTime += 12.0f;
+        }
         //if it is at 30 minutes add 0.5 to float for format
-        if (startMin.equals("30"))
+        if (startMin.getValue().equals("30"))
             startTime += 0.5f;
 
         float endTime = (float) endHour.getValue();
         //if time is PM then add 12 for 24 hour format
-        if (endTimeCombo.equals("PM") && endHour.getValue()!=12.0)
+        if (endTimeCombo.getValue().equals("PM") && endHour.getValue()!=12.0){
             endTime += 12.0f;
+        }
         //if it is at 30 minutes add 0.5 to float for format
-        if (endMin.equals("30"))
+        if (endMin.getValue().equals("30"))
             endTime += 0.5f;
 
         //duration
@@ -179,6 +182,8 @@ public class CreateController {
         //if the task is transient
         else {
             model.createTransientTask(name, "other", startTime, duration, date);
+            System.out.println("STARTTIME: "+startTime);
+            System.out.println("ENDTIME: " + endTime);
         }
     }
 
