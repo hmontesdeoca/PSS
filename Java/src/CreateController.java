@@ -49,7 +49,9 @@ public class CreateController {
     private Button addTaskButton;
 
     //no arg constructor
-    public CreateController(){}
+    public CreateController() {
+    }
+
     @FXML
     public void initialize() {
         startHour.getItems().addAll(1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 11f, 12f);
@@ -62,10 +64,11 @@ public class CreateController {
         endTimeCombo.getItems().addAll("AM", "PM");
     }
 
-    public void setTaskModel(TaskModel model){
+    public void setTaskModel(TaskModel model) {
         this.model = model;
     }
-    public TaskModel getTaskModel(){
+
+    public TaskModel getTaskModel() {
         return this.model;
     }
 
@@ -119,55 +122,63 @@ public class CreateController {
         } else if (transeintRadio.isSelected()) {
             taskEndDate.setDisable(true);
             radioSelected = true;
-            freq=false;
+            freq = false;
         }
         enableButton();
     }
 
     public void enableButton() {
-        if(validName && startDateChosen && startTimeChosen && endTimeChosen && radioSelected && !freq)
+        if (validName && startDateChosen && startTimeChosen && endTimeChosen && radioSelected && !freq)
             addTaskButton.setDisable(false);
-        else if(validName && startDateChosen && startTimeChosen && endTimeChosen && radioSelected && freq && endDateChosen)
+        else if (validName && startDateChosen && startTimeChosen && endTimeChosen && radioSelected && freq && endDateChosen)
             addTaskButton.setDisable(false);
         else
             addTaskButton.setDisable(true);
     }
 
-    public void addTask(){
-        if(freq)
-            if(recurringWeeklyRadio.isSelected()){
+    public void addTask() {
 
+        //grab task name
+        String name = taskName.getText();
+
+        float startTime = (float) startHour.getValue();
+        //if time is PM then add 12 for 24 hour format
+        if (startTimeCombo.equals("pm"))
+            startTime += 12.0f;
+        //if it is at 30 minutes add 0.5 to float for format
+        if (startMin.equals("30"))
+            startTime += 0.5f;
+
+        float endTime = (float) endHour.getValue();
+        //if time is PM then add 12 for 24 hour format
+        if (endTimeCombo.equals("pm"))
+            endTime += 12.0f;
+        //if it is at 30 minutes add 0.5 to float for format
+        if (endMin.equals("30"))
+            endTime += 0.5f;
+
+        //duration
+        float duration = endTime - startTime;
+
+        //start date of task
+        int date = Integer.parseInt(taskStartDate.getValue().toString().replace("-", ""));
+
+        //if this is a recurring task
+        if (freq) {
+            //create an end date for recurring tasks
+            int endDate = Integer.parseInt(taskEndDate.getValue().toString().replace("-", ""));
+            //if this is weekly
+            if (recurringWeeklyRadio.isSelected()) {
+                model.createRecurringTask(name, "other", startTime, duration, date, endDate, 7);
             }
-            else{
-
-                }
-        else{
-            //grab task name
-            String name = taskName.getText();
-
-            float startTime = (float) startHour.getValue();
-            //if time is PM then add 12 for 24 hour format
-            if(startTimeCombo.equals("pm"))
-                startTime+=12.0f;
-            //if it is at 30 minutes add 0.5 to float for format
-            if(startMin.equals("30"))
-                startTime+=0.5f;
-
-            float endTime = (float) endHour.getValue();
-            //if time is PM then add 12 for 24 hour format
-            if(endTimeCombo.equals("pm"))
-                endTime+=12.0f;
-            //if it is at 30 minutes add 0.5 to float for format
-            if(endMin.equals("30"))
-                endTime+=0.5f;
-
-            //duration
-            float duration = endTime-startTime;
-            int date = Integer.parseInt(taskStartDate.getValue().toString().replace("-", ""));
-
-            model.createTransientTask(name, "other",startTime, duration, date);
+            //if this is daily
+            else
+                model.createRecurringTask(name, "other", startTime, duration, date, endDate, 1);
         }
-
-
+        //if the task is transient
+        else {
+            model.createTransientTask(name, "other", startTime, duration, date);
+        }
     }
+
 }
