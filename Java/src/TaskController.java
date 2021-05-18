@@ -10,9 +10,24 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import java.io.IOException;
 import java.time.LocalDate;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import java.io.FileReader;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 
 public class TaskController {
+    // List of task types
+    public static final List<String> transientTypes = Collections.unmodifiableList(Arrays.asList("Visit", "Shopping", "Appointment"));
+    public static final List<String> recurringTypes = Collections.unmodifiableList(Arrays.asList("Class", "Study", "Sleep", "Exercise", "Work", "Meal"));
+    public static final List<String> antiTypes = Collections.unmodifiableList(Arrays.asList("Cancellation"));
+
+    TaskModel taskModel = new TaskModel();  // Have one single instance of TaskModel
+
     String[] months = {"",
             "January", "February", "March",
             "April", "May", "June",
@@ -73,5 +88,90 @@ public class TaskController {
 
     public void deleteTask(){
 
+    }
+
+    /**
+     * Clear schedule
+     */
+    public void resetSchedule() {
+    }
+
+    /**
+     * Read the schedule from a JSON file
+     */
+    public void loadSchedule() {
+        // Possibly call resetSchedule() here if we're loading a new one?
+
+        JSONParser parser = new JSONParser();
+
+        // Get file name from user
+        String fileName = getFileName();
+
+        try {
+            // Read and verify that file exists
+            FileReader fileReader = new FileReader(fileName);
+
+            // Convert json to array
+            JSONArray jsonArray = (JSONArray) parser.parse(fileReader);
+
+            // Add all tasks from file to TaskModel's lists, according for each task type
+            jsonArray.forEach(obj -> {
+                JSONObject task = (JSONObject) obj;
+
+                // Determine what type of task this is through the 'type' attribute
+                if (transientTypes.contains(task.get("Type"))) {
+                    String name = (String) task.get("Name");
+                    String type = (String) task.get("Type");
+                    float startTime = (float) (long) task.get("StartTime");
+                    float duration = (float) (double) task.get("Duration");
+                    int date = (int) (long) task.get("Date");
+
+                    taskModel.createTransientTask(name, type, startTime, duration, date);
+                }
+
+                else if (recurringTypes.contains(task.get("Type"))) {
+                    String name = (String) task.get("Name");
+                    String type = (String) task.get("Type");
+                    float startTime = (float) (long) task.get("StartTime");  // Need to cast twice from Object -> long -> float for some reason
+                    float duration = (float) (double) task.get("Duration");
+                    int startDate = (int) (long) task.get("StartDate");
+                    int endDate = (int) (long) task.get("EndDate");
+                    int frequency = (int) (long) task.get("Frequency");
+
+                    taskModel.createRecurringTask(name, type, startTime, duration, startDate, endDate, frequency);
+                }
+
+                else if (antiTypes.contains(task.get("Type"))) {
+                    String name = (String) task.get("Name");
+                    String type = (String) task.get("Type");
+                    float startTime = (float) (long) task.get("StartTime");
+                    float duration = (float) (double) task.get("Duration");
+                    int date = (int) (long) task.get("Date");
+
+                    taskModel.createAntiTask(name, type, startTime, duration, date);
+                }
+
+                else {
+                    System.out.println("ERROR: Type may not be valid?");
+                }
+            });
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Write schedule to file
+     */
+    public void exportSchedule() {
+        // Get valid file name from user
+    }
+
+    public String getFileName() {
+        // Implement code to grab string using GUI here?
+        String userInput = "Set1.json"; //test value for now
+
+        String prefix = "Java/src/";  // Can modify this depending on where json file is being stored
+        return prefix + userInput;
     }
 }
