@@ -1,6 +1,5 @@
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -30,6 +29,7 @@ public class TaskController {
     public static final List<String> recurringTypes = Collections.unmodifiableList(Arrays.asList("Class", "Study", "Sleep", "Exercise", "Work", "Meal"));
     public static final List<String> antiTypes = Collections.unmodifiableList(Arrays.asList("Cancellation"));
     public ArrayList<String> inCalendar = new ArrayList<>();
+
     // Have one single instance of TaskModel
     private TaskModel taskModel = new TaskModel();
 
@@ -54,6 +54,7 @@ public class TaskController {
     //No Args constructor required
     public TaskController() {
     }
+
     //initialize
     @FXML
     public void initialize() {
@@ -82,19 +83,23 @@ public class TaskController {
 
     //Main Scene Methods
     public void createTask() throws IOException {
-        //TODO: more notes on code
+        //use loader to load scene
         FXMLLoader load = new FXMLLoader(getClass().getResource("CreateTask.FXML"));
-        Stage stage2 = new Stage();
-        stage2.setScene(new Scene(load.load()));
+        Stage stage = new Stage();
+        stage.setScene(new Scene(load.load()));
 
+        //use loader to grab instance of controller
         CreateController temp = load.getController();
 
-        temp.giveStage(stage2);
-        temp.setTaskModel(taskModel);
+        //give the stage to the controller to close it when task is created
+        temp.giveStage(stage);
 
+        //set and get the task model to have the accurate data
+        temp.setTaskModel(taskModel);
         taskModel = temp.getTaskModel();
 
-        stage2.showAndWait();
+        //show and wait and update the calendar to display the new tasks
+        stage.showAndWait();
         updateCalendar();
     }
 
@@ -102,12 +107,25 @@ public class TaskController {
 
     }
 
-    public void deleteTask() {
+    public void deleteTask() throws IOException {
+        //use loader to load scene
+        FXMLLoader load = new FXMLLoader(getClass().getResource("delete.FXML"));
+        Stage stage = new Stage();
+        stage.setScene(new Scene(load.load()));
+        //use loader to grab instance of controller
+        DeleteController del = load.getController();
 
+        //set and get the task model to have the accurate data
+        del.setTaskModel(taskModel);
+        del.populateList();
+        taskModel = del.getTaskModel();
+        stage.showAndWait();
+        updateDelete();
+        updateCalendar();
     }
 
     public void updateCalendar() {
-
+        System.out.println("TASK MODEL SIZE: " + taskModel.getTaskList().size());
         for (int i = 0; i < taskModel.getTransientTasksList().size(); i++) {
             TransientTask currentTask = taskModel.getTransientTasksList().get(i);
             String date = String.valueOf(currentTask.getDate());
@@ -142,6 +160,26 @@ public class TaskController {
                 if (vboxDay == Integer.parseInt(date.substring(6)) && !inCalendar.contains(currentTask.getName())) {
                     temp.getChildren().add(new Text(currentTask.getName()));
                     inCalendar.add(currentTask.getName());
+                }
+            }
+        }
+    }
+
+    public void updateDelete() {
+        for (int i = 0; i < inCalendar.size(); i++) {
+            boolean isDeleted = true;
+            String currentTaskName = inCalendar.get(i);
+            for (int j = 0; j < taskModel.getTaskList().size(); j++) {
+                if (currentTaskName.equals(taskModel.getTaskList().get(i).getName()))
+                    isDeleted = false;
+            }
+            if (isDeleted) {
+                inCalendar.remove(currentTaskName);
+                for (int k = 7; k < calendarPane.getChildren().size() - 1; k++) {
+                    VBox temp = (VBox) calendarPane.getChildren().get(k);
+                    for (int l = 1; l < temp.getChildren().size(); l++)
+                        if (((Text) temp.getChildren().get(l)).getText().equals(currentTaskName))
+                            temp.getChildren().remove(l);
                 }
             }
         }

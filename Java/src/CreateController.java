@@ -10,10 +10,7 @@ import java.time.LocalDate;
 public class CreateController {
     //Task Model
     private TaskModel model;
-
-    //instance of stage
     private Stage stage;
-
     //flags
     boolean validName = false;
     boolean startDateChosen = false;

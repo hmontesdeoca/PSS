@@ -18,6 +18,7 @@ public class TaskModel {
     {
         return recurringTasks;
     }
+
     public void editTask(Task task) {
 
     }
@@ -160,6 +161,7 @@ public class TaskModel {
         AntiTask task = new AntiTask(name, type, startTime, duration, date);
         if (verifyAntiDate(task)) {
             antiTasks.add(task);
+            taskList.add(task);
         }
     }
 
