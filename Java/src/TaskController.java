@@ -82,13 +82,16 @@ public class TaskController {
 
     //Main Scene Methods
     public void createTask() throws IOException {
-        //TODO: display tasks to calendar
+        //TODO: more notes on code
         FXMLLoader load = new FXMLLoader(getClass().getResource("CreateTask.FXML"));
         Stage stage2 = new Stage();
         stage2.setScene(new Scene(load.load()));
+
         CreateController temp = load.getController();
 
+        temp.giveStage(stage2);
         temp.setTaskModel(taskModel);
+
         taskModel = temp.getTaskModel();
 
         stage2.showAndWait();

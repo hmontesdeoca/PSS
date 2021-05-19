@@ -1,6 +1,7 @@
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
@@ -9,6 +10,9 @@ import java.time.LocalDate;
 public class CreateController {
     //Task Model
     private TaskModel model;
+
+    //instance of stage
+    private Stage stage;
 
     //flags
     boolean validName = false;
@@ -50,6 +54,11 @@ public class CreateController {
 
     //no arg constructor
     public CreateController() {
+    }
+
+    //setter forscene
+    public void giveStage(Stage stage){
+        this.stage = stage;
     }
 
     //initialize function for adding items
@@ -194,8 +203,7 @@ public class CreateController {
             System.out.println("STARTTIME: "+startTime);
             System.out.println("ENDTIME: " + endTime);
         }
-
-
+        stage.close();
     }
 
 }
