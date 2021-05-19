@@ -91,7 +91,7 @@ public class TaskController {
         temp.setTaskModel(taskModel);
         taskModel = temp.getTaskModel();
 
-        stage2.show();
+        stage2.showAndWait();
         updateCalendar();
     }
 

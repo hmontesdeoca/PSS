@@ -1,5 +1,9 @@
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
+
 import java.time.LocalDate;
 
 public class CreateController {
@@ -72,6 +76,7 @@ public class CreateController {
     public void checkName() {
         String current = taskName.getText();
         if (model.verifyName(current)) {
+            errorLabel.setText("");
             validName = true;
         }
         else {
@@ -189,6 +194,8 @@ public class CreateController {
             System.out.println("STARTTIME: "+startTime);
             System.out.println("ENDTIME: " + endTime);
         }
+
+
     }
 
 }
