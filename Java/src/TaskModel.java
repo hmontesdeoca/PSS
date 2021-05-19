@@ -1,10 +1,26 @@
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class TaskModel {
     private ArrayList<Task> taskList = new ArrayList<>();
     ArrayList<TransientTask> transientTasks = new ArrayList<>();
     ArrayList<AntiTask> antiTasks = new ArrayList<>();
     ArrayList<RecurringTask> recurringTasks = new ArrayList<>();
+
+    // List of task types
+    public static final List<String> transientTypes = Collections.unmodifiableList(Arrays.asList("Visit", "Shopping", "Appointment"));
+    public static final List<String> recurringTypes = Collections.unmodifiableList(Arrays.asList("Class", "Study", "Sleep", "Exercise", "Work", "Meal"));
+    public static final List<String> antiTypes = Collections.unmodifiableList(Arrays.asList("Cancellation"));
 
     public ArrayList<Task> getTaskList()
     {
@@ -277,39 +293,9 @@ public class TaskModel {
                     float currentTaskEndTime = recTask.getEndTime();
 
                     //This disqualifies same start time, and the task to be added is in the duration of another task
-                    if (task.getStartTime() >= currentTaskStartTime && task.getStartTime() < currentTaskEndTime) {
-                        for (AntiTask antiTask : antiTasks) {
-                            // First check if anti-task date matches the task to be added
-                            if (antiTask.getDate() == task.getDate()) {
-                                // Check if this anti-task matches the recurring task. If it matches, this recurring task shouldn't block the task we are trying to add.
-                                if (antiTask.getStartTime() == recTask.getStartTime()) {
-                                    return true;
-                                } else {
-                                    return false;
-                                }
-                            }
-                        }
-                        return false;
-                    }
-
-                    //is the task has a duration that bleeds onto another task
-                    if (task.getEndTime() > currentTaskStartTime && task.getEndTime() <= currentTaskEndTime) {
-                        for (AntiTask antiTask : antiTasks) {
-                            // First check if anti-task date matches the task to be added
-                            if (antiTask.getDate() == task.getDate()) {
-                                // Check if this anti-task matches the recurring task. If it matches, this recurring task shouldn't block the task we are trying to add.
-                                if (antiTask.getStartTime() == recTask.getStartTime()) {
-                                    return true;
-                                } else {
-                                    return false;
-                                }
-                            }
-                        }
-                        return false;
-                    }
-
-                    // Case where task to be added starts before current task and ends after current task
-                    if (task.getStartTime() <= currentTaskStartTime && task.getEndTime() >= currentTaskEndTime) {
+                    if ((task.getStartTime() >= recTask.getStartTime() && task.getStartTime() < recTask.getEndTime())
+                            || (task.getEndTime() > recTask.getStartTime() && task.getEndTime() <= recTask.getEndTime())
+                            || (task.getStartTime() <= recTask.getStartTime() && task.getEndTime() >= recTask.getEndTime()))  {
                         for (AntiTask antiTask : antiTasks) {
                             // First check if anti-task date matches the task to be added
                             if (antiTask.getDate() == task.getDate()) {
@@ -497,5 +483,151 @@ public class TaskModel {
 
         // No overlap
         return false;
+    }
+    /**
+     * Remove all tasks from our schedule
+     */
+    public void resetSchedule() {
+        transientTasks.clear();
+        recurringTasks.clear();
+        antiTasks.clear();
+    }
+
+    /**
+     * Read the schedule from a JSON file
+     */
+    public void loadSchedule() {
+        // Possibly call resetSchedule() here if we're loading a new one?
+
+        JSONParser parser = new JSONParser();
+
+        // Get file name from user
+        String fileName = getFileName();
+
+        try {
+            // Read and verify that file exists
+            FileReader fileReader = new FileReader(fileName);
+
+            // Convert json to array
+            JSONArray jsonArray = (JSONArray) parser.parse(fileReader);
+
+            // Add all tasks from file to TaskModel's lists, according for each task type
+            jsonArray.forEach(obj -> {
+                JSONObject task = (JSONObject) obj;
+
+                // Determine what type of task this is through the 'type' attribute
+                if (transientTypes.contains(task.get("Type"))) {
+                    String name = (String) task.get("Name");
+                    String type = (String) task.get("Type");
+                    float startTime = (float) (long) task.get("StartTime");
+                    float duration = (float) (double) task.get("Duration");
+                    int date = (int) (long) task.get("Date");
+
+                    createTransientTask(name, type, startTime, duration, date);
+                } else if (recurringTypes.contains(task.get("Type"))) {
+                    String name = (String) task.get("Name");
+                    String type = (String) task.get("Type");
+                    float startTime = (float) (long) task.get("StartTime");  // Need to cast twice from Object -> long -> float for some reason
+                    float duration = (float) (double) task.get("Duration");
+                    int startDate = (int) (long) task.get("StartDate");
+                    int endDate = (int) (long) task.get("EndDate");
+                    int frequency = (int) (long) task.get("Frequency");
+
+                    createRecurringTask(name, type, startTime, duration, startDate, endDate, frequency);
+                } else if (antiTypes.contains(task.get("Type"))) {
+                    String name = (String) task.get("Name");
+                    String type = (String) task.get("Type");
+                    float startTime = (float) (long) task.get("StartTime");
+                    float duration = (float) (double) task.get("Duration");
+                    int date = (int) (long) task.get("Date");
+
+                    createAntiTask(name, type, startTime, duration, date);
+                } else {
+                    System.out.println("ERROR: Type may not be valid?");
+                }
+            });
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Write schedule to JSON file
+     */
+    public void exportSchedule() {
+        // Get valid file name from user
+        String fileName = getFileName();
+
+        try {
+            // Open file
+            FileWriter fileWriter = new FileWriter(fileName);
+
+            JSONArray jsonArray = new JSONArray();
+
+            // Iterate through all transient tasks
+            for (TransientTask task : transientTasks) {
+                // Convert TransientTask object to a JSON object
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("Name", task.getName());
+                jsonObject.put("Type", task.getType());
+                jsonObject.put("Date", task.getDate());
+                jsonObject.put("StartTime", task.getStartTime());
+                jsonObject.put("Duration", task.getDuration());
+
+                // Add to JSON array
+                jsonArray.add(jsonObject);
+            }
+
+            // Write all recurring tasks
+            for (RecurringTask task : recurringTasks) {
+                // Convert RecurringTask object to a JSON object
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("Name", task.getName());
+                jsonObject.put("Type", task.getType());
+                jsonObject.put("StartDate", task.getStartDate());
+                jsonObject.put("StartTime", task.getStartTime());
+                jsonObject.put("Duration", task.getDuration());
+                jsonObject.put("EndDate", task.getEndDate());
+                jsonObject.put("Frequency", task.getFrequency());
+
+                // Add to JSON array
+                jsonArray.add(jsonObject);
+            }
+
+            // Write all anti-tasks
+            for (AntiTask task : antiTasks) {
+                // Convert AntiTask object to a JSON object
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("Name", task.getName());
+                jsonObject.put("Type", task.getType());
+                jsonObject.put("Date", task.getDate());
+                jsonObject.put("StartTime", task.getStartTime());
+                jsonObject.put("Duration", task.getDuration());
+
+                // Add to JSON array
+                jsonArray.add(jsonObject);
+            }
+
+            // Write JSON array to the file
+            fileWriter.write(jsonArray.toJSONString());
+            fileWriter.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getFileName() {
+        // Implement code to grab string from GUI here?
+        String userInput = "Set2.json"; //test value for now
+
+        // Validate that file is JSON
+        String extension = userInput.split("[.]")[1];
+        if (extension.equals("json")) {
+            return userInput;
+        } else {
+            System.out.println("ERROR: invalid file extension");
+            return null;
+        }
     }
 }
